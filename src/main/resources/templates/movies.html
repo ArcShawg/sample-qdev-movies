@@ -3,13 +3,165 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Free Movies This Month</title>
+    <title>Free Movies This Month - Pirate's Treasure Chest</title>
     <link rel="stylesheet" th:href="@{/css/movies.css}">
+    <style>
+        /* Pirate-themed search form styles */
+        .treasure-search {
+            background: linear-gradient(135deg, #8B4513, #A0522D);
+            border: 3px solid #DAA520;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        
+        .treasure-search h2 {
+            color: #FFD700;
+            text-align: center;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            font-family: 'Courier New', monospace;
+        }
+        
+        .search-form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: end;
+            justify-content: center;
+        }
+        
+        .search-field {
+            display: flex;
+            flex-direction: column;
+            min-width: 150px;
+        }
+        
+        .search-field label {
+            color: #FFD700;
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .search-field input {
+            padding: 8px 12px;
+            border: 2px solid #DAA520;
+            border-radius: 5px;
+            background: #FFF8DC;
+            font-size: 14px;
+        }
+        
+        .search-field input:focus {
+            outline: none;
+            border-color: #FFD700;
+            box-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+        }
+        
+        .search-buttons {
+            display: flex;
+            gap: 10px;
+            flex-direction: column;
+        }
+        
+        .btn-pirate {
+            background: linear-gradient(135deg, #DAA520, #FFD700);
+            border: 2px solid #B8860B;
+            color: #8B4513;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-pirate:hover {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .search-message {
+            background: #2F4F4F;
+            color: #FFD700;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            border: 2px solid #DAA520;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+        }
+        
+        .search-message.no-results {
+            background: #8B0000;
+            color: #FFB6C1;
+        }
+        
+        .search-message.error {
+            background: #DC143C;
+            color: #FFFFFF;
+        }
+        
+        @media (max-width: 768px) {
+            .search-form {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-buttons {
+                flex-direction: row;
+                justify-content: center;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <h1>Free Movies This Month</h1>
-        <div class="movies-grid">
+        <h1>🏴‍☠️ Free Movies This Month - Pirate's Treasure Chest 🏴‍☠️</h1>
+        
+        <!-- Pirate-themed Search Form -->
+        <div class="treasure-search">
+            <h2>⚓ Search for Movie Treasures ⚓</h2>
+            <form class="search-form" action="/movies/search-form" method="get">
+                <div class="search-field">
+                    <label for="name">🎬 Movie Name:</label>
+                    <input type="text" id="name" name="name" 
+                           th:value="${searchName}" 
+                           placeholder="Enter movie name, matey!">
+                </div>
+                
+                <div class="search-field">
+                    <label for="id">🆔 Movie ID:</label>
+                    <input type="number" id="id" name="id" 
+                           th:value="${searchId}" 
+                           placeholder="Enter treasure ID" min="1">
+                </div>
+                
+                <div class="search-field">
+                    <label for="genre">🎭 Genre:</label>
+                    <input type="text" id="genre" name="genre" 
+                           th:value="${searchGenre}" 
+                           placeholder="Drama, Action, etc.">
+                </div>
+                
+                <div class="search-buttons">
+                    <button type="submit" class="btn-pirate">🔍 Hunt for Treasure!</button>
+                    <a href="/movies" class="btn-pirate" style="text-decoration: none; text-align: center;">🗺️ Show All Treasures</a>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Search Results Message -->
+        <div th:if="${searchMessage}" 
+             th:class="${'search-message' + (noResults ? ' no-results' : '') + (errorOccurred ? ' error' : '')}"
+             th:text="${searchMessage}">
+        </div>
+        
+        <!-- Movies Grid -->
+        <div class="movies-grid" th:if="${movies != null and !movies.empty}">
             <div class="movie-card" th:each="movie : ${movies}">
                 <div class="movie-icon" th:text="${movie.icon}">🎬</div>
                 <h3 th:text="${movie.movieName}">Movie Title</h3>
@@ -26,9 +178,56 @@
                     </span>
                     <span class="rating-score" th:text="${#numbers.formatDecimal(movie.imdbRating, 1, 1)} + '/5'">5.0/5</span>
                 </div>
-                <a th:href="@{/movies/{id}/details(id=${movie.id})}" class="details-btn">View Details</a>
+                <a th:href="@{/movies/{id}/details(id=${movie.id})}" class="details-btn">⚓ View Details</a>
             </div>
         </div>
+        
+        <!-- No Movies Message -->
+        <div th:if="${movies == null or movies.empty}" class="search-message no-results">
+            <p>🏴‍☠️ Arrr! No movie treasures be found in this chest, matey!</p>
+            <p>Try adjusting yer search terms or <a href="/movies" style="color: #FFD700;">view all treasures</a>.</p>
+        </div>
+        
+        <!-- JavaScript for Enhanced Search Experience -->
+        <script>
+            // Add some pirate flair to the search experience
+            document.addEventListener('DOMContentLoaded', function() {
+                const searchForm = document.querySelector('.search-form');
+                const searchButton = document.querySelector('.btn-pirate[type="submit"]');
+                
+                // Add loading state when searching
+                searchForm.addEventListener('submit', function() {
+                    searchButton.innerHTML = '🔍 Searching for treasure...';
+                    searchButton.disabled = true;
+                });
+                
+                // Add enter key support for all input fields
+                const inputs = document.querySelectorAll('.search-field input');
+                inputs.forEach(input => {
+                    input.addEventListener('keypress', function(e) {
+                        if (e.key === 'Enter') {
+                            searchForm.submit();
+                        }
+                    });
+                });
+                
+                // Add placeholder animations
+                const nameInput = document.getElementById('name');
+                const placeholders = [
+                    'Enter movie name, matey!',
+                    'What treasure ye seek?',
+                    'Name yer movie, arrr!',
+                    'Which film be ye after?'
+                ];
+                
+                let placeholderIndex = 0;
+                setInterval(() => {
+                    if (nameInput === document.activeElement) return; // Don't change if focused
+                    nameInput.placeholder = placeholders[placeholderIndex];
+                    placeholderIndex = (placeholderIndex + 1) % placeholders.length;
+                }, 3000);
+            });
+        </script>
     </div>
 </body>
 </html>
