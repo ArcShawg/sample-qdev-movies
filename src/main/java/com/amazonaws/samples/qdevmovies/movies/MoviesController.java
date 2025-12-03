@@ -104,8 +104,14 @@ public class MoviesController {
             
             return ResponseEntity.ok(response);
             
-        } catch (Exception e) {
-            logger.error("Arrr! Unexpected error during treasure hunt: {}", e.getMessage(), e);
+        } catch (IllegalArgumentException e) {
+            logger.error("Arrr! Invalid argument during treasure hunt: {}", e.getMessage(), e);
+            response.put("success", false);
+            response.put("message", "Arrr! Invalid search parameters provided, matey! " + e.getMessage());
+            response.put("movies", List.of());
+            return ResponseEntity.badRequest().body(response);
+        } catch (RuntimeException e) {
+            logger.error("Arrr! Runtime error during treasure hunt: {}", e.getMessage(), e);
             response.put("success", false);
             response.put("message", "Arrr! Something went wrong during the treasure hunt, matey! Try again later.");
             response.put("movies", List.of());
@@ -165,8 +171,14 @@ public class MoviesController {
             
             return "movies";
             
-        } catch (Exception e) {
-            logger.error("Arrr! Unexpected error during HTML form treasure hunt: {}", e.getMessage(), e);
+        } catch (IllegalArgumentException e) {
+            logger.error("Arrr! Invalid argument during HTML form treasure hunt: {}", e.getMessage(), e);
+            model.addAttribute("movies", List.of());
+            model.addAttribute("searchMessage", "Arrr! Invalid search parameters provided, matey! " + e.getMessage());
+            model.addAttribute("errorOccurred", true);
+            return "movies";
+        } catch (RuntimeException e) {
+            logger.error("Arrr! Runtime error during HTML form treasure hunt: {}", e.getMessage(), e);
             model.addAttribute("movies", List.of());
             model.addAttribute("searchMessage", "Arrr! Something went wrong during the treasure hunt, matey! Try again later.");
             model.addAttribute("errorOccurred", true);
